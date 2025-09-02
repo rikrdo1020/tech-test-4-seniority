@@ -26,7 +26,7 @@ jobs:
         run: dotnet restore ./tests/Api.Tests.csproj
 
       - name: Build
-        run: dotnet build ./tests/Api.Tests/Api.Tests.csproj --no-restore
+        run: dotnet build ./tests/Api.Tests.csproj --no-restore
 
       - name: Run tests
-        run: dotnet test ./tests/Api.Tests/Api.Tests.csproj --no-build --verbosity normal
+        run: dotnet test ./tests/Api.Tests.csproj --no-build --verbosity normal
