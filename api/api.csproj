@@ -7,7 +7,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
+  <ItemGroup>
+    <Content Include="local.settings.json"/>
+  </ItemGroup>
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
@@ -33,10 +35,10 @@
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="local.settings.json">
+    <None Update="local.settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPuplishDirectory>Never</CopyToPuplishDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 
 </Project>
