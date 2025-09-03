@@ -33,10 +33,10 @@
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="local.settings.json">
+    <Content Include="local.settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPuplishDirectory>Never</CopyToPuplishDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 
 </Project>
