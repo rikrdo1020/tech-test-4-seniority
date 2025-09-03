@@ -23,6 +23,20 @@ public class TaskService : ITaskService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Retrieves a paged list of tasks for the current user (provisioned from an external ID),
+    /// applies optional filters and scope ("assigned" or "created"), maps tasks to DTOs, and returns the paged result.
+    /// </summary>
+    /// <param name="currentUserExternalId">External ID of the current user.</param>
+    /// <param name="search">Optional text filter for title/description.</param>
+    /// <param name="status">Optional task status filter.</param>
+    /// <param name="dueDateFrom">Optional inclusive lower bound for due date.</param>
+    /// <param name="dueDateTo">Optional inclusive upper bound for due date.</param>
+    /// <param name="page">Page number (minimum 1).</param>
+    /// <param name="pageSize">Page size (clamped by caller/repo).</param>
+    /// <param name="scope">Scope filter: "assigned" or "created".</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>PagedResult of TaskListItemDto containing items and total count for the selected scope.</returns>
     public async Task<PagedResult<TaskListItemDto>> GetTasksAsync(
         Guid currentUserExternalId,
         string? search = null,
@@ -71,6 +85,16 @@ public class TaskService : ITaskService
         };
     }
 
+    /// <summary>
+    /// Retrieves a task by ID for the current user (provisioned from external ID).
+    /// Verifies user is owner or assignee, maps task to detail DTO.
+    /// </summary>
+    /// <param name="currentUserExternalId">External ID of the current user.</param>
+    /// <param name="taskId">ID of the task to retrieve.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>TaskDetailDto containing task details.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if task does not exist.</exception>
+    /// <exception cref="UnauthorizedAccessException">Thrown if user is not owner or assignee.</exception>
     public async Task<TaskDetailDto> GetByIdAsync(Guid currentUserExternalId, Guid taskId, CancellationToken ct = default)
     {
         var currentUser = await _userService.ProvisionCurrentUserAsync(currentUserExternalId, ct);
@@ -83,6 +107,15 @@ public class TaskService : ITaskService
         return MapToDetailDto(task);
     }
 
+    /// <summary>
+    /// Creates a new task for the current user (provisioned from external ID).
+    /// Assigns task to another user if AssignedToExternalId is provided.
+    /// </summary>
+    /// <param name="currentUserExternalId">External ID of the current user (creator).</param>
+    /// <param name="dto">CreateTaskDto containing task details.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>TaskDetailDto of the created task.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if assigned user is not found.</exception>
     public async Task<TaskDetailDto> CreateAsync(
         Guid currentUserExternalId,
         CreateTaskDto dto,
@@ -114,6 +147,18 @@ public class TaskService : ITaskService
         return MapToDetailDto(created);
     }
 
+    /// <summary>
+    /// Updates an existing task for the current user (provisioned from external ID).
+    /// Verifies user is owner or assignee. Updates task fields and assignee if provided.
+    /// </summary>
+    /// <param name="currentUserExternalId">External ID of the current user.</param>
+    /// <param name="taskId">ID of the task to update.</param>
+    /// <param name="dto">UpdateTaskDto containing updated task details.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>TaskDetailDto of the updated task.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if task does not exist.</exception>
+    /// <exception cref="UnauthorizedAccessException">Thrown if user is not owner or assignee.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if assigned user is not found.</exception>
     public async Task<TaskDetailDto> UpdateAsync(
         Guid currentUserExternalId,
         Guid taskId,
@@ -148,6 +193,17 @@ public class TaskService : ITaskService
         return MapToDetailDto(updated);
     }
 
+    /// <summary>
+    /// Updates the status of an existing task for the current user (provisioned from external ID).
+    /// Verifies user is owner or assignee.
+    /// </summary>
+    /// <param name="currentUserExternalId">External ID of the current user.</param>
+    /// <param name="taskId">ID of the task to update.</param>
+    /// <param name="status">New TaskItemStatus to set.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>TaskDetailDto of the updated task.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if task does not exist.</exception>
+    /// <exception cref="UnauthorizedAccessException">Thrown if user is not owner or assignee.</exception>
     public async Task<TaskDetailDto> UpdateStatusAsync(
         Guid currentUserExternalId,
         Guid taskId,
@@ -167,6 +223,16 @@ public class TaskService : ITaskService
         return MapToDetailDto(updated);
     }
 
+    /// <summary>
+    /// Deletes a task for the current user (provisioned from external ID).
+    /// Verifies user is owner or assignee.
+    /// </summary>
+    /// <param name="currentUserExternalId">External ID of the current user.</param>
+    /// <param name="taskId">ID of the task to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>True if task was deleted, false otherwise.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if task does not exist.</exception>
+    /// <exception cref="UnauthorizedAccessException">Thrown if user is not owner or assignee.</exception>
     public async Task<bool> DeleteAsync(Guid currentUserExternalId, Guid taskId, CancellationToken ct = default)
     {
         var currentUser = await _userService.ProvisionCurrentUserAsync(currentUserExternalId, ct);
@@ -178,11 +244,22 @@ public class TaskService : ITaskService
         return await _taskRepo.DeleteAsync(taskId, ct);
     }
 
+    /// <summary>
+    /// Checks if the given user ID is the creator or assignee of the task.
+    /// </summary>
+    /// <param name="t">TaskItem to check.</param>
+    /// <param name="userId">User ID to verify.</param>
+    /// <returns>True if user is creator or assignee, false otherwise.</returns>
     private bool IsOwnerOrAssignee(TaskItem t, Guid userId)
     {
         return t.CreatedByUserId == userId || (t.AssignedToUserId.HasValue && t.AssignedToUserId.Value == userId);
     }
 
+    /// <summary>
+    /// Maps a <see cref="TaskItem"/> to a <see cref="TaskListItemDto"/>, including user summaries and overdue calculation.
+    /// </summary>
+    /// <param name="t">Task item to map.</param>
+    /// <returns>Mapped <see cref="TaskListItemDto"/>.</returns>
     private TaskListItemDto MapToListItemDto(TaskItem t)
     {
         return new TaskListItemDto
@@ -197,6 +274,11 @@ public class TaskService : ITaskService
         };
     }
 
+    /// <summary>
+    /// Maps a <see cref="TaskItem"/> to a <see cref="TaskDetailDto"/>, including full user details and timestamps.
+    /// </summary>
+    /// <param name="t">Task item to map.</param>
+    /// <returns>Mapped <see cref="TaskDetailDto"/>.</returns>
     private TaskDetailDto MapToDetailDto(TaskItem t)
     {
         return new TaskDetailDto

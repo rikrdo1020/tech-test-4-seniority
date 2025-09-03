@@ -2,20 +2,31 @@ using api.Data.Repositories.Interfaces;
 using api.Models;
 using api.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 namespace api.Data.Repositories.Implementations;
 
 public class TaskRepository : ITaskRepository
 {
     private readonly DataContext _context;
-    private const int MaxPageSize = 100;
     
     public TaskRepository(DataContext context)
     {
         _context = context;
     }
 
+    /// <summary>
+    /// Retrieves a paged list of tasks for the specified user (as creator or assignee),
+    /// with optional text search, status and due date filters.
+    /// </summary>
+    /// <param name="userId">ID of the user (creator or assignee) to fetch tasks for.</param>
+    /// <param name="search">Optional substring to match against Title or Description.</param>
+    /// <param name="status">Optional TaskItemStatus to filter by.</param>
+    /// <param name="dueDateFrom">Optional inclusive lower bound for DueDate.</param>
+    /// <param name="dueDateTo">Optional inclusive upper bound for DueDate.</param>
+    /// <param name="page">Page number (normalized to minimum 1).</param>
+    /// <param name="pageSize">Page size (clamped to a maximum of 100).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>PagedResult&lt;TaskItem&gt; containing Items, TotalCount, Page and PageSize.</returns>
     public async Task<PagedResult<TaskItem>> GetTasksForUserAsync(
         Guid userId,
         string? search = null,
@@ -76,6 +87,12 @@ public class TaskRepository : ITaskRepository
         };
     }
 
+    /// <summary>
+    /// Gets a task by ID, including related CreatedByUser and AssignedToUser entities.
+    /// </summary>
+    /// <param name="id">Task ID to find.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>TaskItem if found, null otherwise.</returns>
     public async Task<TaskItem?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await _context.Tasks
@@ -84,6 +101,16 @@ public class TaskRepository : ITaskRepository
             .FirstOrDefaultAsync(t => t.Id == id, ct);
     }
 
+    /// <summary>
+    /// Gets the total count of tasks for a user (as creator or assignee),
+    /// with optional status and due date filters.
+    /// </summary>
+    /// <param name="userId">ID of the user (creator or assignee) to count tasks for.</param>
+    /// <param name="status">Optional TaskItemStatus to filter by.</param>
+    /// <param name="dueDateFrom">Optional inclusive lower bound for DueDate.</param>
+    /// <param name="dueDateTo">Optional inclusive upper bound for DueDate.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Total count of matching tasks.</returns>
     public async Task<int> GetTaskCountForUserAsync(
         Guid userId,
         TaskItemStatus? status = null,
@@ -112,6 +139,13 @@ public class TaskRepository : ITaskRepository
         return await query.CountAsync(ct);
     }
 
+    /// <summary>
+    /// Creates a new task.
+    /// </summary>
+    /// <param name="task">Task to create.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The created task.</returns>
+    /// <exception cref="DbUpdateException">Thrown if save fails (e.g., foreign key constraint violation).</exception>
     public async Task<TaskItem> CreateAsync(TaskItem task, CancellationToken ct = default)
     {
         _context.Tasks.Add(task);
@@ -119,6 +153,13 @@ public class TaskRepository : ITaskRepository
         return task;
     }
 
+    /// <summary>
+    /// Updates an existing task.
+    /// </summary>
+    /// <param name="task">Task with updated values.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Updated task.</returns>
+    /// <exception cref="DbUpdateConcurrencyException">Thrown if task does not exist.</exception>
     public async Task<TaskItem> UpdateAsync(TaskItem task, CancellationToken ct = default)
     {
         _context.Tasks.Update(task);
@@ -126,6 +167,12 @@ public class TaskRepository : ITaskRepository
         return task;
     }
 
+    /// <summary>
+    /// Deletes a task by ID.
+    /// </summary>
+    /// <param name="id">ID of task to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>True if task was deleted, false if not found.</returns>
     public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
     {
         var task = await GetByIdAsync(id, ct);

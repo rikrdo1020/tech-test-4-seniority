@@ -17,6 +17,14 @@ public class UserRepository : IUserRepository
         _logger = logger;
     }
 
+    /// <summary>
+    /// Query users with optional search and paging.
+    /// </summary>
+    /// <param name="search">Optional name/email search term (wildcard match).</param>
+    /// <param name="page">Page number (minimum 1).</param>
+    /// <param name="pageSize">Page size (clamped between 1 and 100).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>PagedResult containing Items, TotalCount, Page and PageSize.</returns>
     public async Task<PagedResult<User>> QueryAsync(
         string? search = null,
         int page = 1,
@@ -54,6 +62,12 @@ public class UserRepository : IUserRepository
         };
     }
 
+    /// <summary>
+    /// Gets a user by ID.
+    /// </summary>
+    /// <param name="id">User ID to find.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>User if found, null otherwise.</returns>
     public async Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await _context.Users
@@ -61,6 +75,12 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Id == id, ct);
     }
 
+    /// <summary>
+    /// Gets a user by ExternalId.
+    /// </summary>
+    /// <param name="externalId">External ID to find.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>User if found, null otherwise or if externalId is empty.</returns>
     public async Task<User?> GetByExternalIdAsync(Guid externalId, CancellationToken ct = default)
     {
         if (externalId == Guid.Empty) return null;
@@ -70,6 +90,14 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.ExternalId == externalId, ct);
     }
 
+    /// <summary>
+    /// Adds a new user. If a user with the same ExternalId already exists, returns the existing user.
+    /// </summary>
+    /// <param name="user">User to add.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>The added or existing user.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if user is null.</exception>
+    /// <exception cref="DbUpdateException">Thrown if save fails and no existing user is found.</exception>
     public async Task<User> AddAsync(User user, CancellationToken ct = default)
     {
         if (user == null) throw new ArgumentNullException(nameof(user));
@@ -94,6 +122,14 @@ public class UserRepository : IUserRepository
         }
     }
 
+    /// <summary>
+    /// Updates an existing user.
+    /// </summary>
+    /// <param name="user">User with updated values.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Updated user.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if user is null.</exception>
+    /// <exception cref="DbUpdateConcurrencyException">Thrown if user does not exist.</exception>
     public async Task<User> UpdateAsync(User user, CancellationToken ct = default)
     {
         if (user == null) throw new ArgumentNullException(nameof(user));
@@ -103,6 +139,12 @@ public class UserRepository : IUserRepository
         return user;
     }
 
+    /// <summary>
+    /// Deletes a user by ID.
+    /// </summary>
+    /// <param name="id">ID of user to delete.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>True if user was deleted, false if not found.</returns>
     public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id, ct);

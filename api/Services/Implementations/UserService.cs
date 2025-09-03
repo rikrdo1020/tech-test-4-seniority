@@ -16,6 +16,13 @@ public class UserService : IUserService
         _graphService = graphService;
     }
 
+    /// <summary>
+    /// Provisions a user by external ID. If user exists, returns it. Otherwise, fetches from Graph and creates new user.
+    /// </summary>
+    /// <param name="externalId">External ID (e.g., Azure AD ObjectId) of the user.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>UserDto of the provisioned user.</returns>
+    /// <exception cref="ArgumentException">Thrown if externalId is empty.</exception>
     public async Task<UserDto> ProvisionCurrentUserAsync(
         Guid externalId,
         CancellationToken ct = default)
@@ -43,6 +50,13 @@ public class UserService : IUserService
         return MapToDto(created);
     }
 
+    /// <summary>
+    /// Gets the current user by external ID. If not found, provisions the user from Graph.
+    /// </summary>
+    /// <param name="externalId">External ID (e.g., Azure AD ObjectId) of the user.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>UserDto of the user.</returns>
+    /// <exception cref="ArgumentException">Thrown if externalId is empty.</exception>
     public async Task<UserDto> GetCurrentUserAsync(
         Guid externalId,
         CancellationToken ct = default)
@@ -56,6 +70,12 @@ public class UserService : IUserService
         return await ProvisionCurrentUserAsync(externalId, ct);
     }
 
+    /// <summary>
+    /// Gets a user summary by external ID.
+    /// </summary>
+    /// <param name="externalId">External ID of the user.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>UserSummaryDto if found, null otherwise or if externalId is empty.</returns>
     public async Task<UserSummaryDto?> GetUserSummaryByExternalIdAsync(
         Guid externalId,
         CancellationToken ct = default)
@@ -66,6 +86,14 @@ public class UserService : IUserService
         return user != null ? MapToSummaryDto(user) : null;
     }
 
+    /// <summary>
+    /// Searches users with optional text filter and paging, maps results to UserSummaryDto.
+    /// </summary>
+    /// <param name="search">Optional text to search in user name or email.</param>
+    /// <param name="page">Page number (minimum 1).</param>
+    /// <param name="pageSize">Page size (clamped by repository).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>PagedResult of UserSummaryDto containing items and total count.</returns>
     public async Task<PagedResult<UserSummaryDto>> SearchUsersAsync(
         string? search = null,
         int page = 1,
@@ -85,6 +113,16 @@ public class UserService : IUserService
         };
     }
 
+    /// <summary>
+    /// Updates the current user's name and/or email by external ID.
+    /// </summary>
+    /// <param name="externalId">External ID of the user to update.</param>
+    /// <param name="name">New name (if provided and not empty).</param>
+    /// <param name="email">New email (if provided and not empty).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Updated UserDto.</returns>
+    /// <exception cref="ArgumentException">Thrown if externalId is empty.</exception>
+    /// <exception cref="KeyNotFoundException">Thrown if user does not exist.</exception>
     public async Task<UserDto> UpdateCurrentUserAsync(
         Guid externalId,
         string? name = null,
@@ -107,6 +145,16 @@ public class UserService : IUserService
         return MapToDto(updated);
     }
 
+    /// <summary>
+    /// Creates a new user with the provided external ID, name and email.
+    /// </summary>
+    /// <param name="externalId">External ID of the user (required).</param>
+    /// <param name="name">User name (required).</param>
+    /// <param name="email">User email (required).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>UserDto of the created user.</returns>
+    /// <exception cref="ArgumentException">Thrown if externalId is empty or name/email are missing.</exception>
+    /// <exception cref="InvalidOperationException">Thrown if a user with the same ExternalId already exists.</exception>
     public async Task<UserDto> CreateNewUserAsync(
         Guid externalId,
         string name,
@@ -134,6 +182,11 @@ public class UserService : IUserService
         return MapToDto(created);
     }
 
+    /// <summary>
+    /// Maps a <see cref="User"/> entity to a <see cref="UserDto"/>.
+    /// </summary>
+    /// <param name="u">User entity to map.</param>
+    /// <returns>Mapped <see cref="UserDto"/>.</returns>
     private UserDto MapToDto(User u) => new()
     {
         Id = u.Id,
@@ -143,6 +196,11 @@ public class UserService : IUserService
         CreatedAt = u.CreatedAt
     };
 
+    /// <summary>
+    /// Maps a <see cref="User"/> entity to a <see cref="UserSummaryDto"/>.
+    /// </summary>
+    /// <param name="u">User entity to map.</param>
+    /// <returns>Mapped <see cref="UserSummaryDto"/>.</returns>
     private UserSummaryDto MapToSummaryDto(User u) => new()
     {
         Id = u.Id,

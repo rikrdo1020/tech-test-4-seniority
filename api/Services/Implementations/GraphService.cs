@@ -21,6 +21,13 @@ namespace api.Services.Implementations
             _graphClient = new GraphServiceClient(credential);
         }
 
+        /// <summary>
+        /// Retrieves user information from Microsoft Graph by external ID.
+        /// </summary>
+        /// <param name="externalId">External user ID (typically Azure AD ObjectId).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>UserDto containing Name and Email from Graph.</returns>
+        /// <exception cref="ServiceException">Thrown if Graph API call fails.</exception>
         public async Task<UserDto> GetUserFromGraphAsync(Guid externalId, CancellationToken ct = default)
         {
             var userId = externalId.ToString();
