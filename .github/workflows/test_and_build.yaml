@@ -1,8 +1,8 @@
 name: .NET CI/CD
 
 on:
-  push:
-    branches: ["main"]
+  pull_request:
+    branches: ["develop"]
   # pull_request:
   #   branches: ["main"]
 
