@@ -1,7 +1,7 @@
 using api.Data.Repositories.Interfaces;
-using api.Models;
 using api.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using api.Models;
 
 namespace api.Data.Repositories.Implementations;
 
