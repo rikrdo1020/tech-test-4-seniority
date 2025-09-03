@@ -86,7 +86,7 @@ const TopBar = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center p-6 gap-2 w-full">
+        <div className="flex items-center lg:justify-end p-6 gap-2 w-full">
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}

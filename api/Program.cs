@@ -9,8 +9,6 @@ using FluentValidation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = FunctionsApplication.CreateBuilder(args);
@@ -20,7 +18,13 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services.AddLogging();
 
 builder.UseMiddleware<GlobalExceptionMiddleware>();
-builder.UseMiddleware<JwtValidationMiddleware>();
+
+var enableJwt = Environment.GetEnvironmentVariable("EnableJwtMiddleware");
+
+if (string.Equals(enableJwt, "true", StringComparison.OrdinalIgnoreCase))
+{
+    builder.UseMiddleware<JwtValidationMiddleware>();
+}
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
