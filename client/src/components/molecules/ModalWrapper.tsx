@@ -10,7 +10,7 @@ const ModalWrapper = ({ onClose, children }: Props) => {
         className="bg-neutral opacity-80 w-full h-full absolute -z-40"
         onClick={() => onClose()}
       ></div>
-      <div className="bg-base-300 p-6 flex w-full h-auto flex-1 flex-col shadow-lg rounded-t-2xl">
+      <div className="bg-base-300 p-6 flex w-full h-auto flex-1 flex-col shadow-lg rounded-t-2xl max-w-[66rem] mx-auto">
         {children}
       </div>
     </div>
