@@ -5,11 +5,9 @@ using api.Helpers.Middlewares;
 using api.Services;
 using api.Services.Implementations;
 using api.Services.Interfaces;
-using FluentValidation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -26,9 +24,6 @@ if (string.Equals(enableJwt, "true", StringComparison.OrdinalIgnoreCase))
     builder.UseMiddleware<JwtValidationMiddleware>();
 }
 
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-builder.Services.AddFluentValidationAutoValidation();
-
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
@@ -41,6 +36,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGraphService, GraphService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationFactory, NotificationFactory>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+builder.Services.AddSingleton<INotificationPublisher, NoOpNotificationPublisher>();
 
 var app = builder.Build();
 
