@@ -175,7 +175,12 @@ const TaskFormPage: React.FC = () => {
   };
 
   if (isEdit && taskQuery.isLoading) {
-    return <div className="p-6">Loading task...</div>;
+    return (
+      <div className=" h-full flex flex-col items-center justify-center gap-4">
+        <p className="text-2xl font-bold text-primary">Loading...</p>
+        <progress className="progress progress-primary w-56"></progress>
+      </div>
+    );
   }
 
   if (isEdit && taskQuery.isError) {

@@ -7,7 +7,6 @@ import { useUpdateUser, useUser } from "../../app/hooks/useUsers";
 import Input from "../atoms/Input";
 import { useAuth } from "../../app/hooks/useAuth";
 
-// Esquema de validación
 const schema = yup.object({
   name: yup.string().required("Name is required").min(1).max(100),
 });
@@ -38,7 +37,6 @@ const UserEditFormPage: React.FC = () => {
     },
   });
 
-  // Cargar datos del usuario cuando estén listos
   React.useEffect(() => {
     if (userQuery.data) {
       reset({
@@ -50,7 +48,7 @@ const UserEditFormPage: React.FC = () => {
   const onSubmit = async (values: FormValues) => {
     try {
       await updateMutation.mutateAsync(values);
-      navigate(-1); // o a donde prefieras
+      navigate(-1);
     } catch (err) {
       console.error("Update failed", err);
     }

@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import HamburgerMenu from "../../molecules/HamburgerMenu";
 import SearchIcon from "../../../assets/icons/search.svg?react";
 import SearchInput from "../../atoms/SearchInput";
+import NotificationBell from "../../molecules/NotificationBell";
 
 const TopBar = () => {
   const navigate = useNavigate();
@@ -64,15 +65,20 @@ const TopBar = () => {
     <>
       {!showSearch ? (
         <div className="navbar p-6 flex justify-between items-center">
-          <div className="hidden lg:block navbar-start">
+          <div className=" navbar-start">
             <HamburgerMenu />
           </div>
           <div className="navbar-center">
-            <a className="btn btn-ghost text-xl" onClick={() => navigate("/")}>
-              MyTasks
+            <a
+              className="text-2xl font-bold cursor-pointer"
+              onClick={() => navigate("/")}
+            >
+              My
+              <span className="text-primary font-bold font-fjalla">Tasks</span>
             </a>
           </div>
-          <div className="navbar-end flex items-center gap-2">
+          <div className="navbar-end flex justify-beetwen items-end gap-2">
+            <NotificationBell onClick={() => navigate("/notifications")} />
             <button
               className="bg-transparent text-xl px-2"
               aria-label="Open search"
@@ -86,7 +92,7 @@ const TopBar = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center lg:justify-end p-6 gap-2 w-full">
+        <div className="flex items-center justify-end p-6 gap-2 w-full">
           <SearchInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}

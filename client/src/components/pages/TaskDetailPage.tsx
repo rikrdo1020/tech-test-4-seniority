@@ -58,10 +58,6 @@ const TaskDetailPage = () => {
 
   return (
     <div className="pb-6 h-full max-w-3xl mx-auto flex flex-col">
-      {/* <div className="flex items-center justify-between px-6">
-        <h1 className="text-2xl font-bold">Task details</h1>
-        <div />
-      </div> */}
       <div className="divider px-4 mt-0 opacity-35" />
       {taskQuery.isLoading && (
         <div className="flex justify-center py-12">

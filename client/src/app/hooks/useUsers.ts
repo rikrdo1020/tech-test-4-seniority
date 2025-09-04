@@ -112,7 +112,6 @@ export const useUpdateUser = (
       return { previousUser, previousUsers };
     },
     onError: (err, variables, context: any) => {
-      // rollback
       if (context?.previousUser) {
         queryClient.setQueryData(["user", userId], context.previousUser);
       }
@@ -122,7 +121,6 @@ export const useUpdateUser = (
       options?.onError?.(err, variables, context);
     },
     onSettled: (data, _, variables, context) => {
-      // invalidate to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ["user", userId] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
 
