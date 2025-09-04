@@ -5,13 +5,10 @@ using api.Helpers.Middlewares;
 using api.Services;
 using api.Services.Implementations;
 using api.Services.Interfaces;
-using FluentValidation;
+using api.Services.Publishers;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -20,10 +17,13 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services.AddLogging();
 
 builder.UseMiddleware<GlobalExceptionMiddleware>();
-builder.UseMiddleware<JwtValidationMiddleware>();
 
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-builder.Services.AddFluentValidationAutoValidation();
+var enableJwt = Environment.GetEnvironmentVariable("EnableJwtMiddleware");
+
+if (string.Equals(enableJwt, "true", StringComparison.OrdinalIgnoreCase))
+{
+    builder.UseMiddleware<JwtValidationMiddleware>();
+}
 
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
@@ -37,6 +37,12 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGraphService, GraphService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationFactory, NotificationFactory>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
+builder.Services.AddSingleton<INotificationPublisher, NoOpNotificationPublisher>();
 
 var app = builder.Build();
 

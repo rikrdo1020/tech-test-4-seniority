@@ -126,7 +126,6 @@ public class UserService : IUserService
     public async Task<UserDto> UpdateCurrentUserAsync(
         Guid externalId,
         string? name = null,
-        string? email = null,
         CancellationToken ct = default)
     {
         if (externalId == Guid.Empty)
@@ -137,9 +136,6 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(name))
             user.Name = name.Trim();
-
-        if (!string.IsNullOrWhiteSpace(email))
-            user.Email = email.Trim();
 
         var updated = await _userRepository.UpdateAsync(user, ct);
         return MapToDto(updated);

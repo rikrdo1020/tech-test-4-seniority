@@ -1,10 +1,7 @@
 ﻿using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 
 namespace api.Helpers.Middlewares
 {
@@ -24,6 +21,14 @@ namespace api.Helpers.Middlewares
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
             var httpRequest = await context.GetHttpRequestDataAsync();
+
+            var path = httpRequest?.Url.AbsolutePath;
+            if (path != null && PublicPaths.Any(p => path.Equals(p, StringComparison.OrdinalIgnoreCase)))
+            {
+                await next(context);
+                return;
+            }
+
             var authorizationHeader = httpRequest?.Headers.FirstOrDefault(h => h.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase)).Value;
 
             var token = authorizationHeader?.FirstOrDefault()?.Split(" ").Last();
@@ -85,6 +90,15 @@ namespace api.Helpers.Middlewares
 
             return keys;
         }
+
+        private static readonly string[] PublicPaths = new[]
+        {
+            "/api/swagger/ui",
+            "/api/swagger.json",
+            "/api/openapi/v3.json",
+            "/api/openapi/v3.yaml"
+        };
+
 
     }
 }

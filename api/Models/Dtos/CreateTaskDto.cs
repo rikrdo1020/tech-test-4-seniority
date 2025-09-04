@@ -1,4 +1,3 @@
-using api.Models.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace api.Models.Dtos;

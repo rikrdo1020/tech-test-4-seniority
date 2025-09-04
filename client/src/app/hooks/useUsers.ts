@@ -62,12 +62,11 @@ export const useUsers = (
 };
 
 export const updateUserRequest = async (
-  id: string,
   dto: UpdateUserDto | Partial<User>,
   signal?: AbortSignal
 ): Promise<User> => {
   return apiFetch(
-    `/users/${id}`,
+    `/users/me`,
     {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -85,7 +84,7 @@ export const useUpdateUser = (
   const { onSuccess: _omit, ...restOptions } = options || {};
 
   return useMutation<User, Error, UpdateUserDto | Partial<User>>({
-    mutationFn: (dto) => updateUserRequest(userId, dto),
+    mutationFn: (dto) => updateUserRequest(dto),
     ...restOptions,
     onMutate: async (newDto) => {
       await queryClient.cancelQueries({ queryKey: ["user", userId] });

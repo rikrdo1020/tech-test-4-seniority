@@ -12,6 +12,7 @@ public class DataContext : DbContext
 
     public DbSet<TaskItem> Tasks { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

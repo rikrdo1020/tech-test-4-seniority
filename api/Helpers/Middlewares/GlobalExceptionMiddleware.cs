@@ -3,7 +3,6 @@ using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
-using Microsoft.Extensions.Logging;
 
 namespace api.Helpers.Middlewares;
 
@@ -24,6 +23,7 @@ public class GlobalExceptionMiddleware : IFunctionsWorkerMiddleware
         }
         catch (Exception ex)
         {
+            //TODO: Add app insights logging here
             _logger.LogError(ex, "Unhandled exception in function {FunctionName}", context.FunctionDefinition.Name);
 
             var statusCode = HttpStatusCode.InternalServerError;

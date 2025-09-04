@@ -1,0 +1,1059 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "OpenAPI Document on Azure Functions",
+        "description": "This is the OpenAPI Document on Azure Functions",
+        "version": "1.0.0"
+    },
+    "host": "localhost:7219",
+    "basePath": "/api",
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get notifications for the current user",
+                "description": "Retrieves a paginated list of notifications for the authenticated user.",
+                "operationId": "GetNotifications",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "The page number to retrieve.",
+                        "type": "integer",
+                        "format": "int32",
+                        "x-ms-summary": "Page number",
+                        "x-ms-visibility": "important"
+                    },
+                    {
+                        "in": "query",
+                        "name": "pageSize",
+                        "description": "Number of notifications per page.",
+                        "type": "integer",
+                        "format": "int32",
+                        "x-ms-summary": "Page size",
+                        "x-ms-visibility": "important"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of notifications for the authenticated user.",
+                        "schema": {
+                            "$ref": "#/definitions/pagedResult_notificationDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Create a new notification",
+                "description": "Creates a new notification for a user based on the provided payload.",
+                "operationId": "CreateNotification",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The notification data to create.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/createNotificationDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "The newly created notification.",
+                        "schema": {
+                            "$ref": "#/definitions/notificationDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or missing required fields.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications/{id}/read": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark a notification as read",
+                "description": "Marks the specified notification as read for the authenticated user.",
+                "operationId": "MarkAsRead",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The unique identifier of the notification to mark as read.",
+                        "required": true,
+                        "type": "string",
+                        "format": "uuid",
+                        "x-ms-summary": "Notification ID"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Notification marked as read successfully."
+                    },
+                    "400": {
+                        "description": "Invalid notification ID format."
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/notifications/readAll": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark all notifications as read",
+                "description": "Marks all notifications as read for the currently authenticated user.",
+                "operationId": "MarkAllAsRead",
+                "responses": {
+                    "204": {
+                        "description": "All notifications marked as read successfully."
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/notifications/unread-count": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get unread notifications count",
+                "description": "Returns the number of unread notifications for the currently authenticated user.",
+                "operationId": "GetUnreadNotificationsCount",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The count of unread notifications.",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/dashboard": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Get dashboard data",
+                "description": "Retrieves the dashboard information for the currently authenticated user.",
+                "operationId": "GetDashboard",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The dashboard data for the authenticated user.",
+                        "schema": {
+                            "$ref": "#/definitions/dashboardDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/tasks": {
+            "post": {
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Create a new task",
+                "description": "Creates a new task for the currently authenticated user based on the provided task data.",
+                "operationId": "CreateTask",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Task data including title, description, due date, and status.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/createTaskDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "The newly created task.",
+                        "schema": {
+                            "$ref": "#/definitions/taskDetailDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing request body."
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Retrieve all tasks for the current user",
+                "description": "Returns a paginated list of tasks assigned to the authenticated user, with optional filters for search, status, due date range, and scope.",
+                "operationId": "GetAllTasks",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "search",
+                        "description": "Optional search term to filter tasks by title or description.",
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "status",
+                        "description": "Optional task status filter (e.g., Pending, Completed).",
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "dueDateFrom",
+                        "description": "Optional start date to filter tasks by due date (ISO format).",
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "dueDateTo",
+                        "description": "Optional end date to filter tasks by due date (ISO format).",
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "scope",
+                        "description": "Optional scope filter (e.g., 'assigned', 'created'). Default is 'assigned'.",
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "page",
+                        "description": "Page number for pagination (default is 1).",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "path",
+                        "name": "pageSize",
+                        "description": "Number of items per page (default is 20).",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of tasks matching the filter criteria.",
+                        "schema": {
+                            "$ref": "#/definitions/pagedResult_taskDetailDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/tasks/{id}": {
+            "get": {
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Retrieve a task by ID",
+                "description": "Returns the details of a specific task assigned to the authenticated user.",
+                "operationId": "GetTaskById",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The unique identifier of the task to retrieve.",
+                        "required": true,
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The requested task details.",
+                        "schema": {
+                            "$ref": "#/definitions/taskDetailDto"
+                        }
+                    },
+                    "404": {
+                        "description": "No task was found with the given ID."
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Update an existing task",
+                "description": "Updates the details of a specific task assigned to the authenticated user.",
+                "operationId": "UpdateTask",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The unique identifier of the task to update.",
+                        "required": true,
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Updated task data including title, description, due date, and status.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/updateTaskDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The updated task.",
+                        "schema": {
+                            "$ref": "#/definitions/taskDetailDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing request body."
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Delete a task",
+                "description": "Deletes a specific task assigned to the authenticated user.",
+                "operationId": "DeleteTask",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The unique identifier of the task to delete.",
+                        "required": true,
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "The task was successfully deleted."
+                    },
+                    "404": {
+                        "description": "No task was found with the given ID."
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/tasks/{id}/status": {
+            "patch": {
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Update the status of a task",
+                "description": "Updates the status of a specific task assigned to the authenticated user.",
+                "operationId": "UpdateTaskStatus",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The unique identifier of the task to update.",
+                        "required": true,
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "JSON body containing the new status value. Example: { \"status\": \"Completed\" }",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The updated task with the new status.",
+                        "schema": {
+                            "$ref": "#/definitions/taskDetailDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing status value in the request body."
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/users/provision": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Provision the current authenticated user",
+                "description": "Creates or updates the profile of the currently authenticated user based on their external ID claim.",
+                "operationId": "ProvisionUser",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "Optional provisioning data for the user.",
+                        "schema": {
+                            "$ref": "#/definitions/provisionUserDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "The user was successfully provisioned and created.",
+                        "schema": {
+                            "$ref": "#/definitions/userDto"
+                        }
+                    },
+                    "200": {
+                        "description": "The user was already provisioned and returned.",
+                        "schema": {
+                            "$ref": "#/definitions/userDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/users/me": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get current authenticated user",
+                "description": "Retrieves the profile of the currently authenticated user based on their external ID claim.",
+                "operationId": "GetCurrentUser",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The authenticated user's profile.",
+                        "schema": {
+                            "$ref": "#/definitions/userDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    },
+                    "404": {
+                        "description": "No user was found for the given external ID."
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update current authenticated user",
+                "description": "Updates the profile information of the currently authenticated user based on their external ID claim.",
+                "operationId": "UpdateCurrentUser",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "User data to update, including name and email.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/provisionUserDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The updated user profile.",
+                        "schema": {
+                            "$ref": "#/definitions/userDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid or missing request body."
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        },
+        "/users/{externalId}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Retrieve a user by external ID",
+                "description": "Returns a user summary based on the provided external ID.",
+                "operationId": "GetUserByExternalId",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "externalId",
+                        "description": "The external ID of the user.",
+                        "required": true,
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The user summary was successfully retrieved.",
+                        "schema": {
+                            "$ref": "#/definitions/userSummaryDto"
+                        }
+                    },
+                    "404": {
+                        "description": "No user was found with the given external ID."
+                    },
+                    "400": {
+                        "description": "The external ID provided is invalid or missing."
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Search users",
+                "description": "Returns a paginated list of users filtered by optional search term.",
+                "operationId": "SearchUsers",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "search",
+                        "description": "Optional search term to filter users by name or email.",
+                        "type": "string"
+                    },
+                    {
+                        "in": "path",
+                        "name": "page",
+                        "description": "Page number for pagination (default is 1).",
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "in": "path",
+                        "name": "pageSize",
+                        "description": "Number of items per page (default is 20).",
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of users matching the search criteria.",
+                        "schema": {
+                            "$ref": "#/definitions/pagedResult_userDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed or token is missing."
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "createNotificationDto": {
+            "type": "object",
+            "properties": {
+                "recipientUserId": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "type": {
+                    "format": "int32",
+                    "default": 0,
+                    "enum": [
+                        0,
+                        1,
+                        2,
+                        3
+                    ],
+                    "type": "integer"
+                },
+                "relatedTaskId": {
+                    "format": "uuid",
+                    "type": "string"
+                }
+            }
+        },
+        "createTaskDto": {
+            "required": [
+                "title"
+            ],
+            "type": "object",
+            "properties": {
+                "title": {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "description": {
+                    "maxLength": 500,
+                    "minLength": 0,
+                    "type": "string"
+                },
+                "dueDate": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "assignedToExternalId": {
+                    "format": "uuid",
+                    "type": "string"
+                }
+            }
+        },
+        "dashboardDto": {
+            "type": "object",
+            "properties": {
+                "relevantPeriod": {
+                    "type": "string"
+                },
+                "tasksDueToday": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/taskListItemDto"
+                    }
+                },
+                "tasksDueThisWeek": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/taskListItemDto"
+                    }
+                },
+                "tasksDueThisMonth": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/taskListItemDto"
+                    }
+                },
+                "upcomingTasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/taskListItemDto"
+                    }
+                },
+                "counts": {
+                    "$ref": "#/definitions/taskCountsDto"
+                }
+            }
+        },
+        "notificationDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "recipientUserId": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "relatedTaskId": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "type": {
+                    "format": "int32",
+                    "default": 0,
+                    "enum": [
+                        0,
+                        1,
+                        2,
+                        3
+                    ],
+                    "type": "integer"
+                },
+                "isRead": {
+                    "type": "boolean"
+                },
+                "createdAt": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "readAt": {
+                    "format": "date-time",
+                    "type": "string"
+                }
+            }
+        },
+        "pagedResult_notificationDto": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/notificationDto"
+                    }
+                },
+                "totalCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "page": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            }
+        },
+        "pagedResult_taskDetailDto": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/taskDetailDto"
+                    }
+                },
+                "totalCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "page": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            }
+        },
+        "pagedResult_userDto": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/userDto"
+                    }
+                },
+                "totalCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "page": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            }
+        },
+        "provisionUserDto": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "taskCountsDto": {
+            "type": "object",
+            "properties": {
+                "pending": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "inProgress": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "done": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "total": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            }
+        },
+        "taskDetailDto": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "id": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "status": {
+                    "format": "int32",
+                    "default": 0,
+                    "enum": [
+                        0,
+                        1,
+                        2
+                    ],
+                    "type": "integer"
+                },
+                "dueDate": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "isOverdue": {
+                    "type": "boolean"
+                },
+                "assignedTo": {
+                    "$ref": "#/definitions/userSummaryDto"
+                },
+                "createdBy": {
+                    "$ref": "#/definitions/userSummaryDto"
+                }
+            }
+        },
+        "taskListItemDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "status": {
+                    "format": "int32",
+                    "default": 0,
+                    "enum": [
+                        0,
+                        1,
+                        2
+                    ],
+                    "type": "integer"
+                },
+                "dueDate": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "isOverdue": {
+                    "type": "boolean"
+                },
+                "assignedTo": {
+                    "$ref": "#/definitions/userSummaryDto"
+                },
+                "createdBy": {
+                    "$ref": "#/definitions/userSummaryDto"
+                }
+            }
+        },
+        "updateTaskDto": {
+            "required": [
+                "title",
+                "itemStatus"
+            ],
+            "type": "object",
+            "properties": {
+                "title": {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                "description": {
+                    "maxLength": 500,
+                    "minLength": 0,
+                    "type": "string"
+                },
+                "dueDate": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "itemStatus": {
+                    "format": "int32",
+                    "default": 0,
+                    "enum": [
+                        0,
+                        1,
+                        2
+                    ],
+                    "type": "integer"
+                },
+                "assignedToExternalId": {
+                    "format": "uuid",
+                    "type": "string"
+                }
+            }
+        },
+        "userDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "externalId": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "format": "date-time",
+                    "type": "string"
+                }
+            }
+        },
+        "userSummaryDto": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "externalId": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

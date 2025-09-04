@@ -24,8 +24,6 @@ namespace api.Helpers
                     // skip value
                 }
             }
-
-            // return an array with at least one
             return value;
         }
     }
