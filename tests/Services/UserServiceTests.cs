@@ -287,7 +287,6 @@ namespace Api.Tests.Services
                 Id = Guid.NewGuid(),
                 ExternalId = externalId,
                 Name = "Old Name",
-                Email = "old@email.com",
                 CreatedAt = DateTime.UtcNow
             };
             var updatedUser = new User
@@ -295,7 +294,6 @@ namespace Api.Tests.Services
                 Id = user.Id,
                 ExternalId = externalId,
                 Name = "New Name",
-                Email = "new@email.com",
                 CreatedAt = user.CreatedAt
             };
 
@@ -304,7 +302,7 @@ namespace Api.Tests.Services
                 .ReturnsAsync(user);
 
             _userReporMock
-                .Setup(r => r.UpdateAsync(It.Is<User>(u => u.Name == "New Name" && u.Email == "new@email.com"), It.IsAny<CancellationToken>()))
+                .Setup(r => r.UpdateAsync(It.Is<User>(u => u.Name == "New Name"), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(updatedUser);
 
             var service = CreateService();
@@ -315,7 +313,6 @@ namespace Api.Tests.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal("New Name", result.Name);
-            Assert.Equal("new@email.com", result.Email);
         }
 
         [Fact]
