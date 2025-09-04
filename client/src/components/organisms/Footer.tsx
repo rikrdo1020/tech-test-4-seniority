@@ -26,12 +26,12 @@ const Footer = () => {
           </button>
         </div>
         <div className="navbar-center">
-          <button
+          <a
             className="text-xl"
             onClick={() => navigate("/notifications")}
           >
             <NotificationBell />
-          </button>
+          </a>
         </div>
         <div className="navbar-center" onClick={() => navigate("/me/edit")}>
           <Avatar size="xs" rounded="full" />

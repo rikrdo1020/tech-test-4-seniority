@@ -14,7 +14,7 @@ const schema = yup.object({
 type FormValues = yup.Asserts<typeof schema>;
 
 const UserEditFormPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const id = user?.localAccountId;
   const navigate = useNavigate();
 
@@ -60,8 +60,10 @@ const UserEditFormPage: React.FC = () => {
 
   return (
     <div className="max-w-xl mx-auto p-6 h-full flex flex-col flex-grow">
-      <div>
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold mb-4">My Profile</h1>
+        <button className="btn btn-error lg:hidden" onClick={logout}>Logout</button>
+
       </div>
 
       <form
@@ -102,6 +104,7 @@ const UserEditFormPage: React.FC = () => {
           </button>
         </div>
       </form>
+
     </div>
   );
 };
