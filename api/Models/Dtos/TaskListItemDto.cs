@@ -6,7 +6,7 @@ namespace api.Models.Dtos
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
-        public TaskItemStatus ItemStatus { get; set; }
+        public TaskItemStatus Status { get; set; }
         public DateTime? DueDate { get; set; }
         public bool IsOverdue { get; set; }
         public UserSummaryDto? AssignedTo { get; set; }

@@ -266,7 +266,7 @@ public class TaskService : ITaskService
         {
             Id = t.Id,
             Title = t.Title,
-            ItemStatus = t.ItemStatus,
+            Status = t.ItemStatus,
             DueDate = t.DueDate,
             IsOverdue = t.DueDate.HasValue && t.DueDate.Value.Date < DateTime.UtcNow.Date,
             AssignedTo = t.AssignedToUser != null ? new UserSummaryDto { Id = t.AssignedToUser.Id, Name = t.AssignedToUser.Name, Email = t.AssignedToUser.Email, ExternalId = t.AssignedToUser.ExternalId } : null,
@@ -286,7 +286,7 @@ public class TaskService : ITaskService
             Id = t.Id,
             Title = t.Title,
             Description = t.Description,
-            ItemStatus = t.ItemStatus,
+            Status = t.ItemStatus,
             DueDate = t.DueDate,
             IsOverdue = t.DueDate.HasValue && t.DueDate.Value.Date < DateTime.UtcNow.Date,
             AssignedTo = t.AssignedToUser != null ? new UserSummaryDto { Id = t.AssignedToUser.Id, Name = t.AssignedToUser.Name, Email = t.AssignedToUser.Email, ExternalId = t.AssignedToUser.ExternalId } : null,

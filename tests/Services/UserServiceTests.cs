@@ -287,7 +287,6 @@ namespace Api.Tests.Services
                 Id = Guid.NewGuid(),
                 ExternalId = externalId,
                 Name = "Old Name",
-                Email = "old@email.com",
                 CreatedAt = DateTime.UtcNow
             };
             var updatedUser = new User
@@ -295,7 +294,6 @@ namespace Api.Tests.Services
                 Id = user.Id,
                 ExternalId = externalId,
                 Name = "New Name",
-                Email = "new@email.com",
                 CreatedAt = user.CreatedAt
             };
 
@@ -304,18 +302,17 @@ namespace Api.Tests.Services
                 .ReturnsAsync(user);
 
             _userReporMock
-                .Setup(r => r.UpdateAsync(It.Is<User>(u => u.Name == "New Name" && u.Email == "new@email.com"), It.IsAny<CancellationToken>()))
+                .Setup(r => r.UpdateAsync(It.Is<User>(u => u.Name == "New Name"), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(updatedUser);
 
             var service = CreateService();
 
             // Act
-            var result = await service.UpdateCurrentUserAsync(externalId, "New Name", "new@email.com");
+            var result = await service.UpdateCurrentUserAsync(externalId, "New Name");
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal("New Name", result.Name);
-            Assert.Equal("new@email.com", result.Email);
         }
 
         [Fact]
@@ -332,7 +329,7 @@ namespace Api.Tests.Services
 
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-                service.UpdateCurrentUserAsync(externalId, "Any Name", "any@email.com"));
+                service.UpdateCurrentUserAsync(externalId, "Any Name"));
         }
 
         [Fact]

@@ -52,5 +52,9 @@ export const apiFetch = async (
     throw new Error(text || response.statusText);
   }
 
-  return response.json();
+  const contentType = response.headers.get("Content-Type");
+  const hasBody =
+    response.status !== 204 && contentType?.includes("application/json");
+
+  return hasBody ? response.json() : undefined;
 };

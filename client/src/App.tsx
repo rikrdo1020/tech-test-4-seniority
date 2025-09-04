@@ -7,6 +7,8 @@ import Layout from "./components/organisms/Layout";
 import AllTasksPage from "./components/pages/AllTasksPage";
 import TaskFormPage from "./components/pages/TaskFormPage";
 import UserEditFormPage from "./components/pages/UserEditFormPage";
+import NotificationsPage from "./components/pages/NotificationPage";
+import TaskDetailPage from "./components/pages/TaskDetailPage";
 
 function App() {
   return (
@@ -31,8 +33,10 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="tasks" element={<AllTasksPage />} />
           <Route path="tasks/new" element={<TaskFormPage />} />
+          <Route path="tasks/:id" element={<TaskDetailPage />} />
           <Route path="tasks/:id/edit" element={<TaskFormPage />} />
           <Route path="me/edit" element={<UserEditFormPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
         </Route>
       </Routes>
     </>

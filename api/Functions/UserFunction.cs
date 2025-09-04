@@ -214,7 +214,7 @@ namespace api.Functions
             if (dto == null)
                 return new BadRequestObjectResult("Invalid request body.");
 
-            var updated = await _userService.UpdateCurrentUserAsync(externalId, dto.Name, dto.Email, ct);
+            var updated = await _userService.UpdateCurrentUserAsync(externalId, dto.Name, ct);
             return new OkObjectResult(updated);
         }
 

@@ -1,5 +1,4 @@
 using api.Models;
-using api.Models.Dtos;
 using api.Models.Entities;
 
 namespace api.Data.Repositories.Interfaces;

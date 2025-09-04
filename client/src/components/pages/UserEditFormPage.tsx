@@ -10,7 +10,6 @@ import { useAuth } from "../../app/hooks/useAuth";
 // Esquema de validación
 const schema = yup.object({
   name: yup.string().required("Name is required").min(1).max(100),
-  email: yup.string().email("Invalid email").required("Email is required"),
 });
 
 type FormValues = yup.Asserts<typeof schema>;
@@ -36,7 +35,6 @@ const UserEditFormPage: React.FC = () => {
     resolver: yupResolver(schema) as Resolver<FormValues>,
     defaultValues: {
       name: "",
-      email: "",
     },
   });
 
@@ -45,7 +43,6 @@ const UserEditFormPage: React.FC = () => {
     if (userQuery.data) {
       reset({
         name: userQuery.data.name ?? "",
-        email: userQuery.data.email ?? "",
       });
     }
   }, [userQuery.data, reset]);
@@ -79,14 +76,6 @@ const UserEditFormPage: React.FC = () => {
             placeholder="Enter full name"
             {...register("name")}
             error={errors.name?.message}
-          />
-
-          <Input
-            label="Email"
-            type="email"
-            placeholder="user@example.com"
-            {...register("email")}
-            error={errors.email?.message}
           />
 
           {updateMutation.isError && (

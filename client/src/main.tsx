@@ -10,7 +10,7 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error: any) => {
-        if (error.message === "Token expirado o inválido") {
+        if (error.message === "Expired token or invalid") {
           return false;
         }
         return failureCount < 3;
