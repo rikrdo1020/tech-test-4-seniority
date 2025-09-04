@@ -17,6 +17,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Create dummy local.settings.json
+        run: echo "{}" > api/local.settings.json
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
