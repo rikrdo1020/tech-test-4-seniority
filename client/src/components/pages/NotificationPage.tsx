@@ -47,8 +47,9 @@ const NotificationsPage = () => {
       </div>
 
       {isFetching && (
-        <div className="flex justify-center my-6">
-          <span className="loading loading-spinner loading-md"></span>
+        <div className=" h-full flex flex-col items-center justify-center gap-4">
+          <p className="text-2xl font-bold text-primary">Loading...</p>
+          <progress className="progress progress-primary w-56"></progress>
         </div>
       )}
 

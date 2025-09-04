@@ -106,9 +106,7 @@ client/
 
 3. Apply database migrations:
 
-   ```bash
-   dotnet ef database update
-   ```
+   The database schema is automatically updated on application startup by applying any pending migrations, including the creation of the stored procedure (`sp_AddNotification`) which efficiently inserts notifications and returns the inserted record in a single operation, enhancing performance and consistency.
 
 4. Start the Azure Functions host locally:
 
@@ -132,7 +130,7 @@ client/
    ```env
    VITE_ENTRA_CLIENT_ID=<Frontend App Registration Client ID>
    VITE_ENTRA_CLIENT_AUTHORITY=https://login.microsoftonline.com/<Tenant ID>
-   VITE_ENTRA_SCOPE=<Backend API scope>
+   VITE_ENTRA_SCOPE=<api://{Api App Registration Client ID}/{Scope Name}>
    VITE_ENTRA_REDIRECT_URI=http://localhost:3000
    VITE_ENTRA_LOGOUT_URI=http://localhost:3000
    VITE_SERVER_API_URL=http://localhost:7071/api
