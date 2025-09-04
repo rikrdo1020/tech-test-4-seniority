@@ -24,9 +24,10 @@ const DashboardPage = () => {
 
   const tasksQuery = useTasks(params);
   const dashboardQuery = useDashboard();
+
   if (dashboardQuery.isLoading || tasksQuery.isLoading)
     return (
-      <div className=" h-screen flex flex-col items-center justify-center gap-4">
+      <div className=" h-full flex flex-col items-center justify-center gap-4">
         <p className="text-2xl font-bold text-primary">Loading...</p>
         <progress className="progress progress-primary w-56"></progress>
       </div>
@@ -46,7 +47,7 @@ const DashboardPage = () => {
         </div>
 
         <div className="flex flex-col px-6 gap-4">
-          <p className="text-xl font-semibold">Monthly Preview</p>
+          <p className="text-xl font-semibold">Preview</p>
           <PreviewGrid {...dashboardQuery.data?.counts} />
         </div>
 
