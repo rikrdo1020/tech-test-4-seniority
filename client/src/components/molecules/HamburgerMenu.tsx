@@ -3,11 +3,14 @@ import HamburgerIcon from "../../assets/icons/hamburger.svg?react";
 import HomeIcon from "../../assets/icons/home.svg?react";
 import AddIcon from "../../assets/icons/add_2.svg?react";
 import TaskIcon from "../../assets/icons/task.svg?react";
+import LogoutIcon from "../../assets/icons/logout.svg?react";
 import NotificationBell from "../molecules/NotificationBell";
 import Avatar from "../atoms/Avatar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../app/hooks/useAuth";
 
 const HamburgerMenu = () => {
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -29,7 +32,7 @@ const HamburgerMenu = () => {
         onChange={(e) => setOpen(e.target.checked)}
       />
 
-      <div className="flex-none">
+      <div className="flex-none hidden lg:block">
         <button
           type="button"
           aria-label="open sidebar"
@@ -81,13 +84,13 @@ const HamburgerMenu = () => {
           </li>
 
           <li>
-            <button
+            <a
               className="flex gap-2"
               onClick={() => handleNavigation("/notifications")}
             >
               <NotificationBell />
               Notifications
-            </button>
+            </a>
           </li>
 
           <li className="mt-auto">
@@ -97,6 +100,15 @@ const HamburgerMenu = () => {
             >
               <Avatar size="xs" rounded="full" />
               Profile
+            </button>
+          </li>
+          <li className="mt-2">
+            <button
+              className="flex gap-2 bg-error"
+              onClick={logout}
+            >
+              <LogoutIcon />
+              Logout
             </button>
           </li>
         </ul>
