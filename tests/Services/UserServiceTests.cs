@@ -310,7 +310,7 @@ namespace Api.Tests.Services
             var service = CreateService();
 
             // Act
-            var result = await service.UpdateCurrentUserAsync(externalId, "New Name", "new@email.com");
+            var result = await service.UpdateCurrentUserAsync(externalId, "New Name");
 
             // Assert
             Assert.NotNull(result);
@@ -332,7 +332,7 @@ namespace Api.Tests.Services
 
             // Act & Assert
             await Assert.ThrowsAsync<KeyNotFoundException>(() =>
-                service.UpdateCurrentUserAsync(externalId, "Any Name", "any@email.com"));
+                service.UpdateCurrentUserAsync(externalId, "Any Name"));
         }
 
         [Fact]

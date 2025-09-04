@@ -312,7 +312,7 @@ public class TaskServiceTests
         Assert.Equal(dto.Title, result.Title);
         Assert.Equal(dto.Description, result.Description);
         Assert.Equal(dto.DueDate, result.DueDate);
-        Assert.Equal(dto.ItemStatus, result.ItemStatus);
+        Assert.Equal(dto.ItemStatus, result.Status);
     }
 
     [Fact]
@@ -401,7 +401,7 @@ public class TaskServiceTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(TaskItemStatus.Done, result.ItemStatus);
+        Assert.Equal(TaskItemStatus.Done, result.Status);
     }
 
     [Fact]
