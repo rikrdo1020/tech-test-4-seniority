@@ -5,6 +5,7 @@ export interface Task {
   title: string;
   description: string;
   dueDate: Date;
+  isOverdue?: boolean;
   status: TaskStatus;
   createdBy: User;
   assignedTo: User | null;

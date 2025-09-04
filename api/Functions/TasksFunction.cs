@@ -238,7 +238,7 @@ public class TasksFunction
         Description = "The unique identifier of the task to update.")]
     [OpenApiRequestBody(
         contentType: "application/json",
-        bodyType: typeof(object), // Puedes reemplazar con un DTO si lo defines
+        bodyType: typeof(object),
         Required = true,
         Description = "JSON body containing the new status value. Example: { \"status\": \"Completed\" }")]
     [OpenApiResponseWithBody(

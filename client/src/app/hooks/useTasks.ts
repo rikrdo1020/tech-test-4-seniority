@@ -41,12 +41,15 @@ export const useTask = (id?: string): UseQueryResult<Task, Error> => {
 const toQueryString = (params: UseTasksParams) => {
   const qs = new URLSearchParams();
   if (params.search) qs.set("search", params.search);
-  if (params.status) qs.set("status", params.status.toString());
+  if (params.status !== undefined && params.status !== null)
+    qs.set("status", String(params.status));
   if (params.dueDateFrom) qs.set("dueDateFrom", params.dueDateFrom);
   if (params.dueDateTo) qs.set("dueDateTo", params.dueDateTo);
   if (params.scope) qs.set("scope", params.scope);
-  if (params.page) qs.set("page", String(params.page));
-  if (params.pageSize) qs.set("pageSize", String(params.pageSize));
+  if (params.page !== undefined && params.page !== null)
+    qs.set("page", String(params.page));
+  if (params.pageSize !== undefined && params.pageSize !== null)
+    qs.set("pageSize", String(params.pageSize));
   return qs.toString();
 };
 
@@ -63,9 +66,32 @@ export const useTasks = (
   params: UseTasksParams = {},
   options?: UseQueryOptions<PaginatedTasks, Error>
 ) => {
+  const {
+    search = "",
+    status = undefined,
+    dueDateFrom = undefined,
+    dueDateTo = undefined,
+    scope = undefined,
+    page = 1,
+    pageSize = 20,
+  } = params;
+
   return useQuery<PaginatedTasks, Error>({
-    queryKey: ["tasks", params],
-    queryFn: ({ signal }) => fetchTasks(params, signal),
+    queryKey: [
+      "tasks",
+      search,
+      status,
+      dueDateFrom,
+      dueDateTo,
+      scope,
+      page,
+      pageSize,
+    ],
+    queryFn: ({ signal }) =>
+      fetchTasks(
+        { search, status, dueDateFrom, dueDateTo, scope, page, pageSize },
+        signal
+      ),
     staleTime: 1000 * 60 * 0.5,
     placeholderData: keepPreviousData,
     ...options,
@@ -83,9 +109,9 @@ export const createTaskRequest = async (payload: CreateTaskDto) => {
 };
 
 export const useCreateTask = (
-  options?: UseMutationOptions<unknown, Error, CreateTaskDto>
+  options?: UseMutationOptions<Task, Error, CreateTaskDto>
 ) => {
-  return useMutation<unknown, Error, CreateTaskDto>({
+  return useMutation<Task, Error, CreateTaskDto>({
     mutationFn: (payload: CreateTaskDto) => createTaskRequest(payload),
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });

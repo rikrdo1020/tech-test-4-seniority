@@ -1,98 +1,90 @@
-```markdown
 # 📌 MyTasks
 
-**MyTasks** is a task management application that combines a **React + Vite frontend** with an **Azure Functions backend**.  
-The system integrates authentication with **Microsoft Entra ID (External Identities)**, persistence in **SQL using Entity Framework (Code First)**, and a design focused on **mobile first**.
+**MyTasks** is a modern task management application combining a **React + Vite frontend** with a robust **Azure Functions backend**.  
+The system leverages **Microsoft Entra ID (External Identities)** for secure authentication, persists data in **SQL Server via Entity Framework Core (Code First)**, and follows a **mobile-first design philosophy**.
 
 ---
 
-## 🚀 Main Technologies
+## 🚀 Core Technologies
 
 ### 🔹 Backend (Azure Functions)
 
-- **Azure Functions Isolated v4** (.NET 9)
-- **Entity Framework Core (Code First)** with SQL
-- **Microsoft Entra ID** for authentication/authorization
-- **Graph API** for user data and provisioning
-- Patterns: **Factory**, **Repository**, **Dependency Injection**
-- Custom middleware for request validation (designed to migrate to APIM)
+- **Azure Functions Isolated v4** (.NET 9) for scalable serverless APIs.
+- **Entity Framework Core (Code First)** with SQL Server for data persistence.
+- **Microsoft Entra ID** for authentication and authorization, with two dedicated App Registrations (frontend and backend) to ensure secure token flows.
+- **Microsoft Graph API** integration to securely fetch and provision user data.
+- Architectural patterns:
+  - **Repository Pattern** for clean data access abstraction.
+  - **Factory Pattern** to flexibly create different notification types.
+  - **Dependency Injection** for modular, testable services.
+- Custom middleware for JWT validation and global exception handling, designed to be replaceable by Azure API Management (APIM) when available.
+- Pagination and filtering implemented on API endpoints for efficient data retrieval.
+- Notification system designed with a publisher abstraction, currently using a no-op publisher but ready to extend to SignalR, email, or push notifications.
 
 ### 🔹 Frontend (React + Vite)
 
-- **React 18 + Vite**
-- **TanStack Query** (data fetching + caching)
-- **React Hook Form** for forms
-- Authentication integrated with **frontend app registration** in Microsoft Entra
+- **React 18** with **Vite** for fast, modern frontend development.
+- **Mobile-first** responsive UI design.
+- **TanStack Query** for efficient data fetching, caching, and synchronization.
+- **React Hook Form** for robust form validation and management.
+- Custom React hooks to encapsulate API calls and avoid repetitive code.
+- Authentication integrated with Microsoft Entra ID via a dedicated frontend App Registration, enabling secure token acquisition and API access.
 
 ---
 
-## 📂 Project Structure
-```
+## 📂 Project Structure Overview
 
+```
 api/
-│
-│
 ├── Data/
-│ └── Repositories/
-│ ├── Implementations/ # Repository implementations
-│ └── Interfaces/ # Repository interfaces
-│
-├── Functions/ # Azure Functions endpoints
-│
+│   ├── Repositories/
+│   │   ├── Implementations/   # EF Core repository implementations
+│   │   └── Interfaces/        # Repository interfaces
+├── Functions/                 # Azure Functions endpoints (Dashboard, Tasks, Notifications, Users)
 ├── Helpers/
-│ ├── Middlewares/ # Custom middlewares
-│ └── Validations/ # Input validation helpers
-│
-├── Migrations/ # Entity Framework migrations
-│
+│   ├── Middlewares/           # JwtValidationMiddleware, GlobalExceptionMiddleware
+│   └── Validations/           # Input validation helpers
+├── Migrations/                # EF Core migrations
 ├── Models/
-│ ├── Dtos/ # Data Transfer Objects
-│ ├── Entities/ # Database entities
-│ └── Factories/ # Factory pattern implementations
-│
-├── Properties/ # Project settings
-│
+│   ├── Dtos/                  # Data Transfer Objects
+│   ├── Entities/              # Database entities
+│   └── Factories/             # Notification factory implementations
+├── Properties/                # Project settings
 ├── Services/
-│ ├── Implementations/ # Service implementations
-│ └── Interfaces/ # Service interfaces
-│
-└── README.md # Project documentation
+│   ├── Implementations/       # Business logic services
+│   └── Interfaces/            # Service interfaces
+└── Program.cs                 # Application entry point
 
 client/
-│
-├───public/ # Static public files
-└───src/
-├───app/ # Core application logic
-│ ├───context/ # Global state (React Context API)
-│ ├───helpers/ # Utility functions and helpers
-│ ├───hooks/ # Custom React hooks
-│ ├───routes/ # Application routes
-│ ├───services/ # API and external service logic
-│ └───types/ # TypeScript types and interfaces
-│
-├───assets/ # Static assets
-│ └───icons/ # Application icons
-│
-└───components/ # UI components
-├───atoms/ # Smallest building blocks (buttons, inputs, etc.)
-├───molecules/ # Compositions of atoms
-├───organisms/ # More complex UI components
-│ ├───PreviewGrid/ # Specific UI module
-│ └───TopBar/ # Top navigation bar
-└───pages/ # Page-level components (views)
-
-````
+├── public/                    # Static assets
+└── src/
+    ├── app/
+    │   ├── context/           # React Context API for global state
+    │   ├── helpers/           # Utility functions
+    │   ├── hooks/             # Custom React hooks for API calls
+    │   ├── routes/            # Application routing
+    │   ├── services/          # API service layer
+    │   └── types/             # TypeScript types and interfaces
+    ├── assets/                # Icons and static assets
+    └── components/
+        ├── atoms/             # Small reusable UI components (buttons, inputs)
+        ├── molecules/         # Compositions of atoms
+        ├── organisms/         # Complex UI components (e.g., PreviewGrid, TopBar)
+        └── pages/             # Page-level components (views)
+```
 
 ---
 
 ## ⚙️ Getting Started
 
-### 1️⃣ Backend (Azure Functions)
-1. Install dependencies:
+### Backend Setup
+
+1. Restore dependencies:
+
    ```bash
    cd api
    dotnet restore
-````
+   ```
 
 2. Configure environment variables in `local.settings.json`:
 
@@ -102,28 +94,31 @@ client/
      "Values": {
        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-       "SqlConnectionString": "",
-       "AppRegistrationCliendId": "",
-       "TenantId": "",
-       "AppRegistrationClientSecret": ""
+       "SqlConnectionString": "<Your SQL Connection String>",
+       "AppRegistrationClientId": "<Backend App Registration Client ID>",
+       "TenantId": "<Azure Tenant ID>",
+       "AppRegistrationClientSecret": "<Backend Client Secret>",
+       "EnableJwtMiddleware": "<Boolean>"
      },
      "Host": { "CORS": "*" }
    }
    ```
 
-3. Run initial migrations:
+3. Apply database migrations:
 
    ```bash
    dotnet ef database update
    ```
 
-4. Start the local server:
+4. Start the Azure Functions host locally:
 
    ```bash
    func start
    ```
 
-### 2️⃣ Frontend (React + Vite)
+   > **Note:** Setting the environment variable `"EnableJwtMiddleware"` to `false` will bypass the authentication middleware, effectively disabling JWT validation. Use this only for local development or testing purposes, as it disables security checks.
+
+### Frontend Setup
 
 1. Install dependencies:
 
@@ -135,15 +130,15 @@ client/
 2. Configure environment variables in `.env`:
 
    ```env
-    VITE_ENTRA_CLIENT_ID=
-    VITE_ENTRA_CLIENT_AUTHORITY=
-    VITE_ENTRA_SCOPE=
-    VITE_ENTRA_REDIRECT_URI=
-    VITE_ENTRA_LOGOUT_URI=
-    VITE_SERVER_API_URL=
+   VITE_ENTRA_CLIENT_ID=<Frontend App Registration Client ID>
+   VITE_ENTRA_CLIENT_AUTHORITY=https://login.microsoftonline.com/<Tenant ID>
+   VITE_ENTRA_SCOPE=<Backend API scope>
+   VITE_ENTRA_REDIRECT_URI=http://localhost:3000
+   VITE_ENTRA_LOGOUT_URI=http://localhost:3000
+   VITE_SERVER_API_URL=http://localhost:7071/api
    ```
 
-3. Start the local development server:
+3. Start the development server:
 
    ```bash
    npm run dev
@@ -151,56 +146,101 @@ client/
 
 ---
 
-## 🔑 Authentication
+## ☁️ Azure App Registration & Environment Configuration
 
-- **Frontend:** retrieves a JWT token from Microsoft Entra (email or Google account).
-- **Backend:** validates the token, checking `aud` and `iss`.
-- **Graph API:** is used to fetch user data and handle provisioning.
+To properly configure authentication and authorization, you need to create two separate App Registrations in Azure Active Directory: one for the **backend API** and one for the **frontend client**. This setup ensures secure token issuance and validation between the frontend and backend.
+
+### 1. Create App Registrations
+
+- **Backend API App Registration**
+
+  - Represents your protected API.
+  - Used to expose scopes and permissions.
+  - Used by the backend to validate tokens and call Microsoft Graph.
+
+- **Frontend Client App Registration**
+  - Represents your React frontend application.
+  - Used to request tokens for accessing the backend API.
+
+### 2. Configure Backend App Registration
+
+- Go to **Expose an API** tab.
+- Set the **Application ID URI** (usually `api://{backend-app-client-id}`).
+- Add a new **scope** by filling out the form:
+
+  - Scope name (e.g., `access_as_user`)
+  - Who can consent (Admins only or Admins and users)
+  - Admin consent display name and description
+  - User consent display name and description
+  - Enable the scope (State: Enabled)
+
+- To get the **Client Secret**:
+  - Navigate to **Certificates & secrets**.
+  - Create a new **Client Secret** and copy its value (you won’t be able to see it again).
+
+### 3. Configure Frontend App Registration
+
+- Go to **API permissions** tab.
+- Click **Add a permission** → **APIs my organization uses**.
+- Search and select your backend API app registration.
+- Select the scope you created (e.g., `access_as_user`).
+- Grant admin consent if required.
 
 ---
 
-## 🛠️ Database & Migrations
+## 🔐 Authentication Flow
 
-The backend uses **EF Core Code First**.
+- The frontend authenticates users via Microsoft Entra ID, supporting email and Google accounts.
+- Upon successful login, the frontend obtains a JWT token scoped for the backend API.
+- The backend validates the token’s signature, audience, and issuer.
+- User profile data is securely fetched from Microsoft Graph API using backend App Registration permissions.
+- This separation ensures secure, scalable, and maintainable authentication flows.
 
-- Create a new migration:
+---
+
+## 🗄️ Database & Migrations
+
+The backend uses the **Entity Framework Core Code First** approach.
+
+- Define or update your entities in code.
+- Create migrations using the CLI:
 
   ```bash
-  dotnet ef migrations add MigrationName
+  dotnet ef migrations add <MigrationName>
   ```
 
-- Apply migrations:
+- **Applying migrations is automatic on application startup** thanks to the following code in `Program.cs`:
 
-  ```bash
-  dotnet ef database update
+  ```csharp
+  using (var scope = app.Services.CreateScope())
+  {
+      var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+      dataContext.Database.Migrate();
+  }
   ```
+
+  This means you do **not** need to run `dotnet ef database update` manually; the app will apply any pending migrations when it starts, ensuring the database schema is always up to date.
+
+- Additionally, the database schema is automatically updated on application startup by applying any pending migrations, including the creation of the stored procedure (`sp_AddNotification`) which efficiently inserts notifications and returns the inserted record in a single operation, enhancing performance and consistency.
 
 ---
 
-## 📈 Observability & CI/CD
+## 🛠️ Development Workflow & CI/CD
 
-Pending implementation:
-
-- Structured logging in backend and frontend
-- Basic metrics and distributed tracing
-- CI/CD pipeline including:
-
-  - Linting
-  - Unit tests (Already integrated)
-  - Migrations
-  - Controlled deployment
+- Branching strategy:
+  - `main`: stable production-ready code.
+  - `develop`: integration and testing.
+- GitHub Actions runs unit tests on every pull request targeting `develop`.
+- Future plans include adding linting, integration tests, and automated deployments.
 
 ---
 
-## 🔒 Operational Security
+## 🚧 Roadmap & Improvements
 
-- Prefer **Managed Identities** whenever possible
-- Apply **least privilege** principle for Graph permissions
-- Periodically rotate client secrets
-- Backend enforces token validation
-- Secure configuration for CORS, headers, and rate limiting
-
-## 📜 License
-
-This project is licensed under the **MIT License**.
-See the [LICENSE](./LICENSE) file for details.
+- Implement soft-delete for data persistence to allow safe record removal.
+- Add optimistic UI updates to improve user experience.
+- Replace polling with SignalR or WebSockets for real-time notifications.
+- Introduce API Management (APIM) for advanced security, rate limiting, and monitoring.
+- Add telemetry (logging, metrics, distributed tracing) for observability.
+- Harden role-based access control (RBAC) with fine-grained permissions.
+- Expand user profile management with additional fields (avatar, phone, address).

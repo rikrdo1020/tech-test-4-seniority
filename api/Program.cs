@@ -5,6 +5,7 @@ using api.Helpers.Middlewares;
 using api.Services;
 using api.Services.Implementations;
 using api.Services.Interfaces;
+using api.Services.Publishers;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,7 @@ builder.Services.AddScoped<IGraphService, GraphService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationFactory, NotificationFactory>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddSingleton<INotificationPublisher, NoOpNotificationPublisher>();
 

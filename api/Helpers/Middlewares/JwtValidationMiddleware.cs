@@ -2,7 +2,6 @@
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 
 namespace api.Helpers.Middlewares
 {
@@ -96,8 +95,8 @@ namespace api.Helpers.Middlewares
         {
             "/api/swagger/ui",
             "/api/swagger.json",
-            "/api/openapi/v1.json",
-            "/api/openapi/v1.yaml"
+            "/api/openapi/v3.json",
+            "/api/openapi/v3.yaml"
         };
 
 

@@ -30,7 +30,10 @@ const TaskCard = ({ id, title, createdBy, status }: TaskCardProps) => {
 
   return (
     <>
-      <div className="card bg-base-300 text-neutral-content w-full">
+      <div
+        className="card bg-base-300 text-neutral-content w-full"
+        onClick={() => navigate(`${id}`)}
+      >
         <div className="card-body items-left text-left text-base-content p-4 flex flex-row">
           <div className="flex-grow flex flex-col gap-2">
             <h2 className="card-title">{title}</h2>

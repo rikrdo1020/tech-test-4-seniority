@@ -27,7 +27,6 @@ public interface IUserService
     Task<UserDto> UpdateCurrentUserAsync(
         Guid externalId,
         string? name = null,
-        string? email = null,
         CancellationToken ct = default);
 
     Task<UserDto> CreateNewUserAsync(

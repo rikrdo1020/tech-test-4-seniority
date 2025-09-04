@@ -17,7 +17,7 @@ const DashboardPage = () => {
   const params = {
     search: undefined,
     status: undefined,
-    scope: "assigned",
+    scope: "all",
     page: 1,
     pageSize: 20,
   };

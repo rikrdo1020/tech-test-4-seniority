@@ -2,7 +2,6 @@ using api.Data.Repositories.Interfaces;
 using api.Models;
 using api.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace api.Data.Repositories.Implementations;
 

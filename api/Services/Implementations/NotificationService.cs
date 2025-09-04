@@ -1,38 +1,46 @@
 ﻿using api.Models;
 using api.Models.Entities;
+using api.Services.Interfaces;
+using api.Services.Publishers;
 
-public interface INotificationPublisher
-{
-    Task PublishAsync(Notification notification); 
-}
 
-public class NoOpNotificationPublisher : INotificationPublisher
-{
-    public Task PublishAsync(Notification notification) => Task.CompletedTask;
-}
 
 public class NotificationService : INotificationService
 {
-    private readonly INotificationRepository _repo;
+    private readonly INotificationRepository _notificationRepo;
     private readonly INotificationFactory _factory;
     private readonly INotificationPublisher _publisher;
+    private readonly IUserService _userService;
 
     public NotificationService(
         INotificationRepository repo,
         INotificationFactory factory,
-        INotificationPublisher publisher)
+        INotificationPublisher publisher,
+        IUserService userService)
     {
-        _repo = repo;
+        _notificationRepo = repo;
         _factory = factory;
         _publisher = publisher;
+        _userService = userService;
     }
 
     public async Task<NotificationDto> CreateAsync(CreateNotificationDto dto)
     {
-        var entity = _factory.Create(dto);
-        var saved = await _repo.AddAsync(entity);
+        var user = await _userService.GetCurrentUserAsync(dto.RecipientUserId);
+        if (user == null)
+            throw new ArgumentException("User not found", nameof(dto.RecipientUserId));
 
-        // Publish for real-time delivery (SignalR / push) — default no-op
+        var newDto = new CreateNotificationDto(
+            user.Id,
+            dto.Title,
+            dto.Message,
+            dto.Type,
+            dto.RelatedTaskId
+        );
+
+        var entity = _factory.Create(newDto);
+        var saved = await _notificationRepo.AddAsync(entity);
+
         await _publisher.PublishAsync(saved);
 
         return MapToDto(saved);
@@ -41,14 +49,18 @@ public class NotificationService : INotificationService
     public async Task<NotificationDto> CreateFromTaskAssignmentAsync(TaskItem task)
     {
         var entity = _factory.CreateForTaskAssignment(task);
-        var saved = await _repo.AddAsync(entity);
+        var saved = await _notificationRepo.AddAsync(entity);
         await _publisher.PublishAsync(saved);
         return MapToDto(saved);
     }
 
-    public async Task<PagedResult<NotificationDto>> GetByUserAsync(Guid userId, int page = 1, int pageSize = 20)
+    public async Task<PagedResult<NotificationDto>> GetByUserAsync(Guid externalId, int page = 1, int pageSize = 20)
     {
-        var paged = await _repo.GetByUserAsync(userId, page, pageSize);
+        var user = await _userService.GetCurrentUserAsync(externalId);
+        if(user == null)
+            throw new ArgumentException("User not found", nameof(externalId));
+
+        var paged = await _notificationRepo.GetByUserAsync(user.Id, page, pageSize);
         var items = paged.Items.Select(MapToDto).ToList();
         return new PagedResult<NotificationDto>
         {
@@ -59,11 +71,23 @@ public class NotificationService : INotificationService
         };
     }
 
-    public async Task<int> GetUnreadCountAsync(Guid userId) => await _repo.GetUnreadCountAsync(userId);
+    public async Task<int> GetUnreadCountAsync(Guid externalUserId)
+    {
+        var user = await _userService.GetCurrentUserAsync(externalUserId);
+        if(user == null) 
+            throw new ArgumentException("User not found", nameof(externalUserId));
+        return await _notificationRepo.GetUnreadCountAsync(user.Id);
+    }
 
-    public async Task MarkAsReadAsync(Guid id) => await _repo.MarkAsReadAsync(id);
+    public async Task MarkAsReadAsync(Guid id) => await _notificationRepo.MarkAsReadAsync(id);
 
-    public async Task MarkAllAsReadAsync(Guid userId) => await _repo.MarkAllAsReadAsync(userId);
+    public async Task MarkAllAsReadAsync(Guid externalUserId)
+    { 
+        var user = await _userService.GetCurrentUserAsync(externalUserId);
+        if(user == null) 
+            throw new ArgumentException("User not found", nameof(externalUserId));
+        await _notificationRepo.MarkAllAsReadAsync(user.Id);
+    }
 
     private NotificationDto MapToDto(Notification n)
     {

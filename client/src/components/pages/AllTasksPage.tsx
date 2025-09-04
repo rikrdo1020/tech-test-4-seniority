@@ -36,18 +36,22 @@ const AllTasksPage = () => {
     setFilters(newFilters);
   };
 
+  const currentStatus = TASK_STATUS_OPTIONS.find(
+    (o) => o.value === filters.status
+  );
+
   return (
     <div className="px-6">
       <div className="flex justify-between">
         <div className="flex gap-2">
-          {filters.status && (
+          {currentStatus && (
             <div
               className="badge badge-outline badge-primary capitalize"
               onClick={() =>
                 setFilters((prev) => ({ ...prev, status: undefined }))
               }
             >
-              {TASK_STATUS_OPTIONS[Number(filters?.status)]?.label}
+              {currentStatus.label}
             </div>
           )}
           {filters.scope && (
@@ -57,7 +61,7 @@ const AllTasksPage = () => {
                 setFilters((prev) => ({ ...prev, scope: undefined }))
               }
             >
-              {TASK_STATUS_OPTIONS[Number(filters?.scope)]?.label}
+              {filters?.scope}
             </div>
           )}
         </div>

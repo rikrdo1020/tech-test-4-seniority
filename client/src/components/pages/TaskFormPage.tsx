@@ -22,6 +22,7 @@ import Autocomplete, {
 import { useUser, useUsers } from "../../app/hooks/useUsers";
 import { useDebounce } from "../../app/hooks/useDebounce";
 import CloseIcon from "../../assets/icons/close.svg?react";
+import { useCreateNotification } from "../../app/hooks/useNotification";
 
 const schema = yup.object({
   title: yup
@@ -80,6 +81,8 @@ const TaskFormPage: React.FC = () => {
   const userQuery = useUser(taskQuery.data?.assignedTo?.externalId || "");
   const createMutation = useCreateTask();
   const updateMutation = useUpdateTask();
+
+  const notificationMutation = useCreateNotification();
 
   const debouncedSearch = useDebounce(searchTerm, 400);
   const usersQuery = useUsers(
@@ -147,9 +150,23 @@ const TaskFormPage: React.FC = () => {
     try {
       if (isEdit && id) {
         await updateMutation.mutateAsync({ id, dto: payloadUpdate });
+        await notificationMutation.mutateAsync({
+          recipientUserId: values.assignedToExternalId || "",
+          title: `Task Updated: ${values.title}`,
+          message: `The task "${values.title}" has been updated.`,
+          type: 1,
+          relatedTaskId: id,
+        });
         navigate(-1);
       } else {
-        await createMutation.mutateAsync(payloadCreate);
+        const result = await createMutation.mutateAsync(payloadCreate);
+        await notificationMutation.mutateAsync({
+          recipientUserId: values.assignedToExternalId || "",
+          title: `Task Created: ${values.title}`,
+          message: `The task "${values.title}" has been created.`,
+          type: 0,
+          relatedTaskId: result.id,
+        });
         navigate("/");
       }
     } catch (err: unknown) {

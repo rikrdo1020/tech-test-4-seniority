@@ -43,7 +43,10 @@ const Layout = () => {
               </button>
             </div>
             <div className="navbar-center">
-              <button className="text-xl">
+              <button
+                className="text-xl"
+                onClick={() => navigate("/notifications")}
+              >
                 <NotificationBell />
               </button>
             </div>
